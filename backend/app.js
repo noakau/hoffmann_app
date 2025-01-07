@@ -1,10 +1,9 @@
 const express = require("express")
 const app = express()
-var sqlinjection = require('sql-injection');
+
 
 app.use(express.json())
-app.use(sqlinjection); // sqlinjection middleware: npm packge   https://www.npmjs.com/package/sql-injection
-// XSS prevention should be done on the frontend with dom purify
+app.use(express.urlencoded({ extended: true }))
 
 
 
