@@ -1,18 +1,12 @@
 import React from "react";
-import { useState, useEffect } from 'react';
-import { edit_task, get_all_tasks } from "./api";
+import { useState, useEffect } from 'react'
+import { edit_task } from "./api";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
-const TaskList = () => {
+function TaskList(props) {
   const [tasks, setTasks] = useState([]);
-
-  // s'execute quand le composant est rendu
-  useEffect(() => {
-      get_all_tasks()
-      .then((tasks) => {setTasks(tasks);})    
-  }, [])
-
+  
   const priorityLabels = ["Faible", "Moyenne", "Importante", "Urgente"];
   const statusLabels = ["À faire", "En cours", "Terminé"];
   const priorityColors = {
@@ -28,51 +22,25 @@ const TaskList = () => {
   };
 
 
+  useEffect(() => {
+    setTasks(props.tasks);
+  }, [props.tasks])
+
   const handlePriorityChange = (id, newPriority) => {
-    const updatedTasks = tasks.map(task =>
-      task.id === id ? { ...task, priority: newPriority } : task
-    );
-    setTasks(updatedTasks);
     edit_task({ id, priority: newPriority }); 
+    props.triggerRefresh();
   };
 
   const handleStatusChange = (id, newStatus) => {
-    const updatedTasks = tasks.map(task =>
-      task.id === id ? { ...task, status: newStatus } : task
-    );
-    setTasks(updatedTasks);
     edit_task({ id, status: newStatus });
+    props.triggerRefresh();
   };
 
-  // Fonction utilitaire pour convertir la priorité en texte lisible
-  const getPriorityLabel = (priority) => {
-    switch (priority) {
-      case 1:
-        return "Faible";
-      case 2:
-        return "Moyenne";
-      case 3:
-        return "Importante";
-      case 4:
-        return "Urgente";
-      default:
-        return "Error";
-    }
-  };
-
-  // Fonction utilitaire pour convertir le statut en texte lisible
-  const getStatusLabel = (status) => {
-    switch (status) {
-      case 1:
-        return "À faire";
-      case 2:
-        return "En cours";
-      case 3:
-        return "Terminé";
-      default:
-        return "Error";
-    }
-  };
+  function printTask(id) {
+    // console.log("should trigger parent to change DisplayTask component")
+    const task = tasks.find(x => x.id == id)
+    props.printTask(task)
+  }
 
   return (
     <div className="container mt-4">
@@ -91,7 +59,7 @@ const TaskList = () => {
         </thead>
         <tbody>
           {tasks.map((task, index) => (
-            <tr key={task.id}>
+            <tr key={task.id} onClick={(e) => printTask(task.id)}>
               <td>{index + 1}</td>
               <td>{task.title}</td>
               <td>{task.description}</td>
