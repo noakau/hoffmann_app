@@ -59,7 +59,7 @@ function TaskList(props) {
         </thead>
         <tbody>
           {tasks.map((task, index) => (
-            <tr key={task.id} onClick={(e) => printTask(task.id)}>
+            <tr key={task.id} onClick={(e) => printTask(task.id)} className="cursor-pointer">
               <td>{index + 1}</td>
               <td>{task.title}</td>
               <td>{task.description}</td>
