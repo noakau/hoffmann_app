@@ -3,11 +3,20 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter as Router, Route, Routes } from 'react-router';
+import CreateTask from './CreateTask';
+import UpdateTask from './UpdateTask';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <App />
+    <Router>
+      <Routes>
+        <Route path="/" element={<App />} />
+        <Route path="/update" element={<UpdateTask />} />
+        <Route path="/create" element={<CreateTask />} />
+      </Routes>
+    </Router>
   </React.StrictMode>
 );
 

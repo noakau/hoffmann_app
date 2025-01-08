@@ -27,7 +27,7 @@ function TaskList(props) {
 
   function printTask(id) {
     // console.log("should trigger parent to change DisplayTask component")
-    const task = tasks.find(x => x.id == id)
+    const task = tasks.find(x => x.id === id)
     props.printTask(task)
   }
 

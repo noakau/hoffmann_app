@@ -1,12 +1,11 @@
 import './App.css';
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router';
 
 import TaskList from './TaskList';
 import DisplayTask from './DisplayTask';
 
 import { get_all_tasks } from "./api";
-
-
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -69,22 +68,25 @@ function App() {
       (task.title.includes(search) || task.description.includes(search));
   });
 
-
-
   return (
-    <div className="App">
-      <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <a className="navbar-brand" href="#">Task Management</a>
-      </nav>
-      <div className="container-fluid">
-        <div className="row">
-          <div className="col-md-2 bg-light border-right">
-            <h5 className="mt-3">Connected Users</h5>
-            {/* Add your connected users component or list here */}
-          </div>
-          <div className="col-md-10">
-            <div className="row">
-            <div className="mb-3 d-flex align-items-center flex-row">
+      <div className="App">
+        <nav className="navbar navbar-expand-lg navbar-light bg-light">
+          <Link className="navbar-brand" to="/">
+            <img src={`${process.env.PUBLIC_URL}/hoffmann_ai_logo.jpeg`} alt="Hoffmann" width="50" height="50" className='mx-2' />
+            Hoffmann task Management
+          </Link>
+
+          <Link className='btn btn-primary float-right' to="/create">Create Task</Link>
+        </nav>
+        <div className="container-fluid">
+          <div className="row">
+            <div className="col-md-2 bg-light border-right">
+              <h5 className="mt-3">Connected Users</h5>
+              {/* Add your connected users component or list here */}
+            </div>
+            <div className="col-md-10">
+              <div className="row">
+                <div className="mb-3 d-flex align-items-center flex-row">
                   <input
                     type="text"
                     name="id"
@@ -140,17 +142,17 @@ function App() {
                 />
                   <button onClick={clearFilters} className="btn btn-secondary mt-2 d-inline-block">Clear Filters</button>
                 </div>
-              <div className="col-md-9">
-                <TaskList tasks={filteredTasks} printTask={printTask} triggerRefresh={refreshTasks}></TaskList>
-              </div>
-              <div className="col-md-3">  
-                <DisplayTask task={task} printTask={printTask} triggerRefresh={refreshTasks}></DisplayTask>
+                  <div className="col-md-9">
+                    <TaskList tasks={filteredTasks} printTask={printTask} triggerRefresh={refreshTasks}></TaskList>
+                  </div>
+                  <div className="col-md-3">
+                    <DisplayTask task={task} printTask={printTask} triggerRefresh={refreshTasks}></DisplayTask>
+                  </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
   );
 }
 
