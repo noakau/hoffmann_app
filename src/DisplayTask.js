@@ -1,23 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { edit_task } from "./api";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { priorityColors, priorityLabels, statusColors, statusLabels} from "./colors.js";
+
 
 function DisplayTask({ task, triggerRefresh, printTask }) {
   const [editedTask, setEditedTask] = useState(task);
 
-  const priorityLabels = ["Faible", "Moyenne", "Importante", "Urgente"];
-  const statusLabels = ["À faire", "En cours", "Terminé"];
-  const priorityColors = {
-    1: "text-success", // vert pour low priority
-    2: "text-info", // bleu pour medium priority
-    3: "text-warning", // jaune pour important
-    4: "text-danger" // rouge pour urgent
-  };
-  const statusColors = {
-    1: "text-secondary", // gris pour "À faire"
-    2: "text-primary", // bleu pour "En cours"
-    3: "text-success" // vert pour "Terminé"
-  };
 
   useEffect(() => {
     setEditedTask(task); // Update state when the task changes
@@ -48,40 +37,16 @@ function DisplayTask({ task, triggerRefresh, printTask }) {
 
           <div className="mb-3">
             <strong>Priorité:</strong>
-            <select
-              className="form-select"
-              value={editedTask.priority}
-              onChange={(e) => handlePriorityChange(parseInt(e.target.value))}
-            >
-              {priorityLabels.map((label, idx) => (
-                <option
-                  key={idx + 1}
-                  value={idx + 1}
-                  className={priorityColors[idx + 1]}
-                >
-                  {label}
-                </option>
-              ))}
-            </select>
+            <p className={priorityColors[editedTask.priority]}>
+              {priorityLabels[editedTask.priority - 1]}
+            </p>
           </div>
 
           <div className="mb-3">
             <strong>Statut:</strong>
-            <select
-              className="form-select"
-              value={editedTask.status}
-              onChange={(e) => handleStatusChange(parseInt(e.target.value))}
-            >
-              {statusLabels.map((label, idx) => (
-                <option
-                  key={idx + 1}
-                  value={idx + 1}
-                  className={statusColors[idx + 1]}
-                >
-                  {label}
-                </option>
-              ))}
-            </select>
+            <p className={statusColors[editedTask.status]}>
+              {statusLabels[editedTask.status - 1]}
+            </p>
           </div>
 
           <p><strong>Date de début:</strong> {editedTask.date_start}</p>

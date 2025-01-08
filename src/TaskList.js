@@ -2,24 +2,13 @@ import React from "react";
 import { useState, useEffect } from 'react'
 import { edit_task } from "./api";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { priorityColors, priorityLabels, statusColors, statusLabels} from "./colors.js";
 
 
 function TaskList(props) {
   const [tasks, setTasks] = useState([]);
   
-  const priorityLabels = ["Faible", "Moyenne", "Importante", "Urgente"];
-  const statusLabels = ["À faire", "En cours", "Terminé"];
-  const priorityColors = {
-    1: "text-success", // vert pour low priority
-    2: "text-info", // bleu pour medium priority
-    3: "text-warning", // jaune pour important
-    4: "text-danger" // rouge pour urgent
-  };
-  const statusColors = {
-    1: "text-secondary", // gris pour "À faire"
-    2: "text-primary", // bleu pour "En cours"
-    3: "text-success" // vert pour "Terminé"
-  };
+  
 
 
   useEffect(() => {
