@@ -3,7 +3,7 @@ const SECRET_KEY = process.env.JWT_SECRET_KEY || "aizdoazndnefiejzaioeufanefbeui
 
 
 function generateToken(user) {
-  const payload = { userId: user.id, email: user.email, isAdmin: user.is_admin }; // jwt a resigned so no possibility to change is_admin: will be used for react interface change
+  const payload = { userId: user.id, username: user.username, email: user.email, isAdmin: user.is_admin }; // jwt a resigned so no possibility to change is_admin: will be used for react interface change
   return jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
 }
 
@@ -12,6 +12,7 @@ function generateToken(user) {
 function authenticateToken(req, res, next) {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
+//   console.log(authHeader, token)
   if (!token) return res.sendStatus(401);
 
   jwt.verify(token, SECRET_KEY, (err, user) => {

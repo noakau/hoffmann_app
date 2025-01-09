@@ -47,6 +47,7 @@ router.get('/user/:id', authenticateToken, async (req, res) => {
 
 router.post('/admin/create-user', authenticateToken, async (req, res) => {
     const { email, password, username } = req.body;
+    // console.log("test")
     // console.log(req.user)
     if (!req.user || !req.user.isAdmin) {
       return res.status(403).json({ error: "Unauthorized" });
@@ -61,7 +62,7 @@ router.post('/admin/create-user', authenticateToken, async (req, res) => {
     
     if (userError) return res.status(400).json({ error: userError.message });
   
-    res.status(201).json({ message: "User created successfully", user: userInfo });
+    res.status(201).json({ message: "User created successfully", user: userInfo, error: null });
 });
   
 router.delete('/admin/delete-user/:id', authenticateToken, async (req, res) => {
