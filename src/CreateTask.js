@@ -22,7 +22,7 @@ const CreateTask = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     add_task(task)
-    navigate("/");
+    navigate("/tasks");
   };
 
   return (

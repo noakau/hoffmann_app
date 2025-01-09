@@ -9,17 +9,17 @@ const LoginPage = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     //Faux login pour navigation
-    if (email === "test@example.com" && password === "password123") {
-      alert("Connexion réussie !");
-      // Stocker un faux token pour simuler l'authentification
-      localStorage.setItem("token", "fake-jwt-token");
-      navigate("/tasks");
+    let jwt = await login(email, password);
+    console.log(jwt)
+    if (jwt.token === null) {
+      setError(jwt.error.toString());
     } else {
-      setError("Identifiants incorrects !");
+      // jwt is stored in localStorage from api/login function
+      navigate("/tasks");
     }
   };
 
@@ -27,6 +27,7 @@ const LoginPage = () => {
     <div className="container d-flex justify-content-center align-items-center vh-100">
       <div className="card p-4 shadow-sm" style={{ maxWidth: "400px", width: "100%" }}>
         <h3 className="text-center">Bienvenue !</h3>
+        {error && <div className="alert alert-danger">{error}</div>}
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">Email</label>
@@ -53,10 +54,6 @@ const LoginPage = () => {
           <button type="submit" className="btn btn-dark">Se connecter</button>
         </form>
         <p>
-        Pas encore de compte ? 
-        <Link to="/register">
-          <button type="button" className="btn btn-link">Créer un compte</button>
-        </Link>
       </p>
         
       </div>

@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { register } from "./api";
+import { create_user } from "./api";
 
-const RegisterPage = () => {
+const CreateUser = () => {
   const [formData, setFormData] = useState({
     nom: '',
     prenom:'',
     email: '',
     password: '',
   });
+  const [error, setError] = useState(null);
+  const navigate = useNavigate("");
 
   const handleChange = (event) => {
     setFormData((prevFormData) => ({
@@ -19,10 +21,20 @@ const RegisterPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const finalForm = {
+      username: formData.nom + ' ' + formData.prenom,
+      email: formData.email,
+      password: formData.password,
+    }
 
     try {
-      const response = await register(formData);
-      alert(response.message);
+      const response = await create_user(finalForm);
+      if (response.error) {
+        setError(response.error)
+      } else {
+        alert(response.message);
+        navigate("/tasks")
+      }
     } catch (error) {
       alert(error.message);
     }
@@ -31,7 +43,8 @@ const RegisterPage = () => {
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
   <div className="card p-4 shadow-sm" style={{ maxWidth: "400px", width: "100%" }}>
-    <h3 className="text-center mb-4">Bienvenue !</h3>
+    <h3 className="text-center mb-4">Remplissez ce form pour créer un utilisateur !</h3>
+    {error && <div className="alert alert-danger">{error}</div>}
     <form onSubmit={handleSubmit}>
       <div className="mb-3">
         <label className="form-label">Nom</label>
@@ -94,4 +107,4 @@ const RegisterPage = () => {
 }
 
   
-export default RegisterPage;
+export default CreateUser;

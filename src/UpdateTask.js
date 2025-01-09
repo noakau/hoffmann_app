@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { edit_task } from "./api";
+import { parseJwt, edit_task, delete_task } from "./api";
 import { priorityLabels, statusLabels } from './colors'
+
 
 const UpdateTask = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [task, setTask] = useState(location.state?.task || {
+    id: '',
     title: '',
     description: '',
     priority: '',
@@ -14,6 +16,27 @@ const UpdateTask = () => {
     date_start: '',
     date_end: ''
   });
+  const [is_admin, setis_admin] = useState(false);
+
+  useEffect(() => {
+    let token = localStorage.getItem('token', null);
+    if (token === null) {
+      setis_admin(false);
+    } else {
+      const data = parseJwt(token);
+      if (data.isAdmin === true) {
+        setis_admin(true);
+      } else {
+        setis_admin(false);
+      }
+    }
+  }, [])
+
+
+  async function handleDelete () {
+    delete_task(task.id)
+    navigate("/tasks");
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,7 +47,7 @@ const UpdateTask = () => {
     e.preventDefault();
     setTask(task);
     edit_task(task);
-    navigate("/");
+    navigate("/tasks");
   };
 
   return (
@@ -68,6 +91,7 @@ const UpdateTask = () => {
           <input type="date" name="date_end" value={task.date_end} onChange={handleChange} className="form-control" required />
         </div>
         <button type="submit" className="btn btn-primary mt-3">Update Task</button>
+        {is_admin && <button type="button" className="btn btn-danger mt-3 ms-3" onClick={handleDelete}>Delete Task</button>}
       </form>
     </div>
   );

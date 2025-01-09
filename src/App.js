@@ -1,18 +1,23 @@
 import './App.css';
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate, Link} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Link} from 'react-router-dom';
 
 import TaskList from './TaskList';
 import DisplayTask from './DisplayTask';
-
+import CreateTask from './CreateTask';
+import UpdateTask from './UpdateTask';
 import LoginPage from './LoginPage'; 
-import RegisterPage from './RegisterPage'; 
+import CreateUser from './CreateUser'; 
+
+import { get_all_tasks, parseJwt } from "./api";
 
 
-import { get_all_tasks } from "./api";
+
+
 function App() {
   const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState([]);
+  const [username, setUsername] = useState("");
   const [filters, setFilters] = useState({
     id: "",
     title: "",
@@ -23,9 +28,12 @@ function App() {
     date_end: "",
   });
   const [search, setSearch] = useState("");
+  const [is_admin, setis_admin] = useState(false);
 
   const priorityLabels = ["Faible", "Moyenne", "Importante", "Urgente"];
   const statusLabels = ["À faire", "En cours", "Terminé"];
+
+
 
   const refreshTasks = () => {
     get_all_tasks().then((newTasks) => {
@@ -43,6 +51,21 @@ function App() {
     get_all_tasks().then((tasks) => {
       setTasks(tasks);
     });
+    let token = localStorage.getItem('token', null);
+    if (token === null) {
+      console.log("user is not even logged in");
+      setis_admin(false);
+    } else {
+      const data = parseJwt(token);
+      setUsername(data.username);
+      if (data.isAdmin === true) {
+        setis_admin(true);
+        console.log("user is an admin")
+      } else {
+        setis_admin(false);
+      console.log("user is not an administrator");
+      }
+    }
   }, []);
 
   const handleFilterChange = (e) => {
@@ -81,11 +104,15 @@ function App() {
   return (
     <Router>
       <Routes>
+        
+                <Route path="/update" element={<UpdateTask />} />
+                <Route path="/create" element={<CreateTask />} />
+
         {/* Route pour la page de connexion */}
         <Route path="/" element={<LoginPage />} />
 
         {/* Route pour la page d'inscription */}
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/create_user" element={<CreateUser />} />
 
         {/* Route pour la gestion des tâches */}
         <Route path ="/tasks"
@@ -93,7 +120,13 @@ function App() {
           element={
             <div className="App">
               <nav className="navbar navbar-expand-lg navbar-light bg-light">
-                <a className="navbar-brand" href="#">Task Management</a>
+                <a className="navbar-brand" href="#">
+                  <img src={`${process.env.PUBLIC_URL}/hoffmann_ai_logo.jpeg`} alt='Hoffmann AI logo' width={"50px"} height={"50px"} className='mx-2'/>
+                </a>
+                <h1 className="text-center">Bonjour {username}</h1>
+
+                  <Link to="/create" className='btn btn-primary mx-4'>CreateTask</Link>
+                  {is_admin && <Link to="/create_user" className='btn btn-success'>Create a User</Link>}
               </nav>
               <div className="container-fluid">
                 <div className="row">
