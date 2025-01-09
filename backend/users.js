@@ -24,27 +24,35 @@ router.get("/", async (req, res) => {
 
 
 
-router.post('/register', async (req, res) => {
-    const { email, password } = req.body;
-    const role = "admin";
-    const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        role,
-    });
-    if (error) return res.status(400).json({ error: error.message });
-    res.status(200).json(data);
-});
+router.post("/register", async (req, res) => {
+    const { email, password, nom, prenom } = req.body;
   
-
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+    // Créer un utilisateur dans Supabase Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
     });
-    if (error) return res.status(401).json({ error: error.message });
-    res.status(200).json(data);
-});
-
-module.exports = router;
+  
+    if (authError) {
+      return res.status(400).json({ error: authError.message });
+    }
+  
+    
+    const { error: profileError } = await supabase
+      .from("profiles")
+      .insert([
+        {
+          user_id: authData.user.id,
+          nom,
+          prenom,
+          email,
+        },
+      ]);
+  
+    if (profileError) {
+      return res.status(400).json({ error: profileError.message });
+    }
+  
+    res.status(200).json({ message: "Compte créé avec succès !" });
+  });
+  module.exports = router;
