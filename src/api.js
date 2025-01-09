@@ -94,3 +94,58 @@ export const edit_task = async (task) => {
         return null;
     }
 };
+export const login = async (email, password) => {
+    try {
+        // Requête POST vers le backend pour la connexion
+        const response = await fetch(`${API_URL}/users/login`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        // Stocker le token dans le localStorage
+        localStorage.setItem('token', data.token);
+
+        return data.user;
+    } catch (error) {
+        console.error("Error logging in:", error);
+        return null;
+    }
+};
+export const register = async (formData) => {
+    try {
+      const response = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+  
+       // Vérifie si la réponse est OK avant d'essayer de la parser en JSON
+    if (!response.ok) {
+        const errorText = await response.text(); 
+        throw new Error(`Erreur du serveur : ${errorText}`);
+      }
+  
+      const data = await response.json();
+  
+      // Vérifie s'il y a une erreur dans les données retournées
+      if (data.error) {
+        throw new Error(data.error);
+      }
+  
+      return data;
+    } catch (error) {
+      console.error('Error signing up:', error);
+      throw error;
+    }
+  };

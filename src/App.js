@@ -1,12 +1,15 @@
 import './App.css';
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router';
+import { BrowserRouter as Router, Route, Routes, Navigate, Link} from 'react-router-dom';
 
 import TaskList from './TaskList';
 import DisplayTask from './DisplayTask';
 
-import { get_all_tasks } from "./api";
+import LoginPage from './LoginPage'; 
+import RegisterPage from './RegisterPage'; 
 
+
+import { get_all_tasks } from "./api";
 function App() {
   const [tasks, setTasks] = useState([]);
   const [task, setTask] = useState([]);
@@ -17,7 +20,7 @@ function App() {
     priority: "",
     status: "",
     date_start: "",
-    date_end: ""
+    date_end: "",
   });
   const [search, setSearch] = useState("");
 
@@ -25,24 +28,27 @@ function App() {
   const statusLabels = ["À faire", "En cours", "Terminé"];
 
   const refreshTasks = () => {
-      get_all_tasks()
-      .then((newTasks) => {setTasks([...newTasks]); console.log(tasks)})  
+    get_all_tasks().then((newTasks) => {
+      setTasks([...newTasks]);
+      console.log(tasks);
+    });
   };
 
   const printTask = (task) => {
-    setTask(task)  
-};
+    setTask(task);
+  };
 
-// s'execute quand le composant est rendu
+  // Exécution lors du rendu du composant
   useEffect(() => {
-        get_all_tasks()
-        .then((tasks) => {setTasks(tasks);})    
-    }, [])
+    get_all_tasks().then((tasks) => {
+      setTasks(tasks);
+    });
+  }, []);
 
   const handleFilterChange = (e) => {
     setFilters({
       ...filters,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -58,101 +64,135 @@ function App() {
       priority: "",
       status: "",
       date_start: "",
-      date_end: ""
+      date_end: "",
     });
     setSearch("");
   };
 
-  const filteredTasks = tasks.filter(task => {
-    return Object.keys(filters).every(key => task[key].toString().includes(filters[key])) &&
-      (task.title.includes(search) || task.description.includes(search));
+  const filteredTasks = tasks.filter((task) => {
+    return (
+      Object.keys(filters).every((key) =>
+        task[key].toString().includes(filters[key])
+      ) &&
+      (task.title.includes(search) || task.description.includes(search))
+    );
   });
 
   return (
-      <div className="App">
-        <nav className="navbar navbar-expand-lg navbar-light bg-light">
-          <Link className="navbar-brand" to="/">
-            <img src={`${process.env.PUBLIC_URL}/hoffmann_ai_logo.jpeg`} alt="Hoffmann" width="50" height="50" className='mx-2' />
-            Hoffmann task Management
-          </Link>
+    <Router>
+      <Routes>
+        {/* Route pour la page de connexion */}
+        <Route path="/" element={<LoginPage />} />
 
-          <Link className='btn btn-primary float-right' to="/create">Create Task</Link>
-        </nav>
-        <div className="container-fluid">
-          <div className="row">
-            <div className="col-md-2 bg-light border-right">
-              <h5 className="mt-3">Connected Users</h5>
-              {/* Add your connected users component or list here */}
-            </div>
-            <div className="col-md-10">
-              <div className="row">
-                <div className="mb-3 d-flex align-items-center flex-row">
-                  <input
-                    type="text"
-                    name="id"
-                    placeholder="Filter by ID"
-                    value={filters.id}
-                    onChange={handleFilterChange}
-                    className="form-control mb-1 me-1 py-2"
-                  />
-                  <select
-                    name="priority"
-                    value={filters.priority}
-                    onChange={handleFilterChange}
-                    className="form-control mb-1 me-1 py-2"
-                  >
-                    <option value="">Filter by Priority</option>
-                    {priorityLabels.map((label, idx) => (
-                      <option key={idx + 1} value={idx + 1}>{label}</option>
-                    ))}
-                  </select>
-                  <select
-                    name="status"
-                    value={filters.status}
-                    onChange={handleFilterChange}
-                    className="form-control mb-1 me-1 py-2"
-                  >
-                    <option value="">Filter by Status</option>
-                    {statusLabels.map((label, idx) => (
-                      <option key={idx + 1} value={idx + 1}>{label}</option>
-                    ))}
-                  </select>
-                  <input
-                    type="date"
-                    name="date_start"
-                    placeholder="Filter by Start Date"
-                    value={filters.date_start}
-                    onChange={handleFilterChange}
-                    className="form-control mb-1 me-1 py-2"
-                  />
-                  <input
-                    type="date"
-                    name="date_end"
-                    placeholder="Filter by End Date"
-                    value={filters.date_end}
-                    onChange={handleFilterChange}
-                    className="form-control mb-1 me-1 py-2"
-                  />
-                  <input
-                  type="text"
-                  placeholder="Search in Title or Description"
-                  value={search}
-                  onChange={handleSearchChange}
-                  className="form-control mb-1 me-1 py-2"
-                />
-                  <button onClick={clearFilters} className="btn btn-secondary mt-2 d-inline-block">Clear Filters</button>
+        {/* Route pour la page d'inscription */}
+        <Route path="/register" element={<RegisterPage />} />
+
+        {/* Route pour la gestion des tâches */}
+        <Route path ="/tasks"
+          
+          element={
+            <div className="App">
+              <nav className="navbar navbar-expand-lg navbar-light bg-light">
+                <a className="navbar-brand" href="#">Task Management</a>
+              </nav>
+              <div className="container-fluid">
+                <div className="row">
+                  <div className="col-md-2 bg-light border-right">
+                    <h5 className="mt-3">Connected Users</h5>
+                    {/* Add your connected users component or list here */}
+                  </div>
+                  <div className="col-md-10">
+                    <div className="row">
+                      <div className="mb-3 d-flex align-items-center flex-row">
+                        <input
+                          type="text"
+                          name="id"
+                          placeholder="Filter by ID"
+                          value={filters.id}
+                          onChange={handleFilterChange}
+                          className="form-control mb-1 me-1 py-2"
+                        />
+                        <select
+                          name="priority"
+                          value={filters.priority}
+                          onChange={handleFilterChange}
+                          className="form-control mb-1 me-1 py-2"
+                        >
+                          <option value="">Filter by Priority</option>
+                          {priorityLabels.map((label, idx) => (
+                            <option key={idx + 1} value={idx + 1}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          name="status"
+                          value={filters.status}
+                          onChange={handleFilterChange}
+                          className="form-control mb-1 me-1 py-2"
+                        >
+                          <option value="">Filter by Status</option>
+                          {statusLabels.map((label, idx) => (
+                            <option key={idx + 1} value={idx + 1}>
+                              {label}
+                            </option>
+                          ))}
+                        </select>
+                        <input
+                          type="date"
+                          name="date_start"
+                          placeholder="Filter by Start Date"
+                          value={filters.date_start}
+                          onChange={handleFilterChange}
+                          className="form-control mb-1 me-1 py-2"
+                        />
+                        <input
+                          type="date"
+                          name="date_end"
+                          placeholder="Filter by End Date"
+                          value={filters.date_end}
+                          onChange={handleFilterChange}
+                          className="form-control mb-1 me-1 py-2"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Search in Title or Description"
+                          value={search}
+                          onChange={handleSearchChange}
+                          className="form-control mb-1 me-1 py-2"
+                        />
+                        <button
+                          onClick={clearFilters}
+                          className="btn btn-secondary mt-2 d-inline-block"
+                        >
+                          Clear Filters
+                        </button>
+                      </div>
+                      <div className="col-md-9">
+                        <TaskList
+                          tasks={filteredTasks}
+                          printTask={printTask}
+                          triggerRefresh={refreshTasks}
+                        ></TaskList>
+                      </div>
+                      <div className="col-md-3">
+                        <DisplayTask
+                          task={task}
+                          printTask={printTask}
+                          triggerRefresh={refreshTasks}
+                        ></DisplayTask>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-                  <div className="col-md-9">
-                    <TaskList tasks={filteredTasks} printTask={printTask} triggerRefresh={refreshTasks}></TaskList>
-                  </div>
-                  <div className="col-md-3">
-                    <DisplayTask task={task} printTask={printTask} triggerRefresh={refreshTasks}></DisplayTask>
-                  </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
+          }
+        />
+
+    
+      </Routes>
+    </Router>
   );
 }
 
