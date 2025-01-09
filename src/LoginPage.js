@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { login } from "./api";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -12,7 +12,7 @@ const LoginPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Simuler la validation des identifiants (test uniquement)
+    //Faux login pour navigation
     if (email === "test@example.com" && password === "password123") {
       alert("Connexion réussie !");
       // Stocker un faux token pour simuler l'authentification
@@ -26,7 +26,7 @@ const LoginPage = () => {
   return (
     <div className="container d-flex justify-content-center align-items-center vh-100">
       <div className="card p-4 shadow-sm" style={{ maxWidth: "400px", width: "100%" }}>
-        <h3 className="text-center">Connexion</h3>
+        <h3 className="text-center">Bienvenue !</h3>
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">Email</label>
@@ -50,11 +50,14 @@ const LoginPage = () => {
               required
             />
           </div>
-          <button type="submit" className="btn btn-primary w-100">Se connecter</button>
+          <button type="submit" className="btn btn-dark">Se connecter</button>
         </form>
-        <a href='RegisterPage.js'>
-        <button type="button" class="btn btn-link">Créer un compte</button>
-        </a>
+        <p>
+        Pas encore de compte ? 
+        <Link to="/register">
+          <button type="button" className="btn btn-link">Créer un compte</button>
+        </Link>
+      </p>
         
       </div>
     </div>

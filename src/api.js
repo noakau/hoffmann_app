@@ -120,25 +120,32 @@ export const login = async (email, password) => {
         return null;
     }
 };
-/*export const register = async (email, password) => {
+export const register = async (formData) => {
     try {
-      const response = await fetch(`${API_URL}/users/register`, {
+      const response = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify(formData),
       });
+  
+       // Vérifie si la réponse est OK avant d'essayer de la parser en JSON
+    if (!response.ok) {
+        const errorText = await response.text(); 
+        throw new Error(`Erreur du serveur : ${errorText}`);
+      }
   
       const data = await response.json();
   
+      // Vérifie s'il y a une erreur dans les données retournées
       if (data.error) {
         throw new Error(data.error);
       }
   
-      return data.user;
+      return data;
     } catch (error) {
-      console.error("Erreur lors de la création du compte :", error);
-      return null;
+      console.error('Error signing up:', error);
+      throw error;
     }
-  };*/
+  };

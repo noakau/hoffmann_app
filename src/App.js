@@ -1,12 +1,12 @@
 import './App.css';
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate, Link} from 'react-router-dom';
 
 import TaskList from './TaskList';
 import DisplayTask from './DisplayTask';
 
 import LoginPage from './LoginPage'; 
-//import RegisterPage from './RegisterPage'; 
+import RegisterPage from './RegisterPage'; 
 
 
 import { get_all_tasks } from "./api";
@@ -82,10 +82,10 @@ function App() {
     <Router>
       <Routes>
         {/* Route pour la page de connexion */}
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/" element={<LoginPage />} />
 
         {/* Route pour la page d'inscription */}
-        {/*<Route path="/register" element={<RegisterPage />} />*/}
+        <Route path="/register" element={<RegisterPage />} />
 
         {/* Route pour la gestion des tâches */}
         <Route path ="/tasks"
