@@ -9,13 +9,11 @@ router.get("/", async (req, res) => {
     .select(`
         id,
         username,
-        is_admin,
-        created_at,
-        auth.users (email)
+        created_at
     `);
 
     if (!error) {
-        res.json({ error: null, data: users });
+        res.json({ error: null, data: data });
     } else {
         console.error(error);
         res.json({ error: error.message, data: null });

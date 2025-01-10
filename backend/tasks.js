@@ -9,7 +9,7 @@ const { authenticateToken } = require("./authService");
 router.get("/get_all", authenticateToken, async (req, res) => {
     let { data, error } = await supabase
     .from('tasks')
-    .select(`*`);
+    .select(`*, user_tasks (user_id)`);
 
     if (!error) {
         res.json({ error: null, data: data });
@@ -23,7 +23,7 @@ router.get("/get/:uuid", authenticateToken, async (req, res) => {
     const task_uuid = req.params.uuid
     let { data, error } = await supabase
     .from('tasks')
-    .select(`*`)
+    .select(`*, user_tasks (user_id)`)
     .eq("id", task_uuid);
 
     if (!error) {
