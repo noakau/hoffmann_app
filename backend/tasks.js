@@ -9,7 +9,8 @@ const { authenticateToken } = require("./authService");
 router.get("/get_all", authenticateToken, async (req, res) => {
     let { data, error } = await supabase
     .from('tasks')
-    .select(`*, user_tasks (user_id)`);
+    .select(`*, user_tasks(user_id)`)
+    .select(`*, users(id, username)`);
 
     if (!error) {
         res.json({ error: null, data: data });
@@ -23,19 +24,20 @@ router.get("/get/:uuid", authenticateToken, async (req, res) => {
     const task_uuid = req.params.uuid
     let { data, error } = await supabase
     .from('tasks')
-    .select(`*, user_tasks (user_id)`)
+    .select(`*, user_tasks(user_id)`)
+    .select(`*, users(username)`)
     .eq("id", task_uuid);
 
-    if (!error) {
+    if (!error && data.length > 0) {
         res.json({ error: null, data: data });
     } else {
         console.error(error);
-        res.json({ error: error.message, data: null });
+        res.json({ error: error ? error.message : 'Task not found', data: null });
     }
 });
 
 router.post("/add", authenticateToken, async (req, res) => {
-    const { title, description, date_start, date_end, priority, status } = req.body;
+    const { title, description, date_start, date_end, priority, status, users } = req.body;
 
     let { data, error } = await supabase
     .from('tasks')
@@ -51,7 +53,14 @@ router.post("/add", authenticateToken, async (req, res) => {
     ])
     .select();
 
-    if (!error) {
+    if (!error && data.length > 0) {
+        const taskId = data[0].id;
+        if (users && users.length > 0) {
+            const userTaskEntries = users.map(userId => ({ task_id: taskId, user_id: userId }));
+            await supabase.from('user_tasks').insert(userTaskEntries);
+        }
+        const notifyClients = req.app.get('notifyClients');
+        notifyClients({ type: 'task_added', task: data });
         res.json({ error: null, data: data });
     } else {
         console.error(error);
@@ -74,6 +83,8 @@ router.delete("/delete", authenticateToken,  async (req, res) => {
     .eq("id", id);
 
     if (!error) {
+        const notifyClients = req.app.get('notifyClients');
+        notifyClients({ type: 'task_deleted', taskId: id });
         res.json({ error: null, data: data });
     } else {
         console.error(error);
@@ -82,7 +93,7 @@ router.delete("/delete", authenticateToken,  async (req, res) => {
 });
 
 router.put("/edit", authenticateToken, async (req, res) => {
-    const { id, title, description, date_start, date_end, priority, status } = req.body;
+    const { id, title, description, date_start, date_end, priority, status, users } = req.body;
 
     let { data, error } = await supabase
     .from('tasks')
@@ -97,8 +108,14 @@ router.put("/edit", authenticateToken, async (req, res) => {
     .eq('id', id)
     .select();
 
-
-    if (!error) {
+    if (!error && data.length > 0) {
+        if (users) {
+            await supabase.from('user_tasks').delete().eq('task_id', id);
+            const userTaskEntries = users.map(user => ({ task_id: id, user_id: user.id }));
+            await supabase.from('user_tasks').insert(userTaskEntries);
+        }
+        const notifyClients = req.app.get('notifyClients');
+        notifyClients({ type: 'task_updated', task: data });
         res.json({ error: null, data: data });
     } else {
         console.error(error);

@@ -4,16 +4,17 @@ var supabase = require("./supabaseClient")
 const { generateToken, authenticateToken } = require("./authService");
 
 router.get("/", async (req, res) => {
-    let { data, error } = await supabase
+    let { data: users, error } = await supabase
     .from('users')
     .select(`
         id,
         username,
+        is_admin,
         created_at
     `);
 
     if (!error) {
-        res.json({ error: null, data: data });
+        res.json({ error: null, data: users });
     } else {
         console.error(error);
         res.json({ error: error.message, data: null });
@@ -22,7 +23,6 @@ router.get("/", async (req, res) => {
 
 router.get('/user/:id', authenticateToken, async (req, res) => {
     const { id } = req.params;
-
     const { data, error } = await supabase
         .from('users')
         .select(`
