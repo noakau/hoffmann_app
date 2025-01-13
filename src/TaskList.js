@@ -1,22 +1,17 @@
-import React from "react";
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from "react";
 import { edit_task } from "./api";
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { priorityColors, priorityLabels, statusColors, statusLabels} from "./colors.js";
-
+import { priorityColors, priorityLabels, statusColors, statusLabels } from "./colors.js";
 
 function TaskList(props) {
   const [tasks, setTasks] = useState([]);
-  
-  
-
 
   useEffect(() => {
     setTasks(props.tasks);
-  }, [props.tasks])
+  }, [props.tasks]);
 
   const handlePriorityChange = (id, newPriority) => {
-    edit_task({ id, priority: newPriority }); 
+    edit_task({ id, priority: newPriority });
     props.triggerRefresh();
   };
 
@@ -26,9 +21,8 @@ function TaskList(props) {
   };
 
   function printTask(id) {
-    // console.log("should trigger parent to change DisplayTask component")
-    const task = tasks.find(x => x.id === id)
-    props.printTask(task)
+    const task = tasks.find(x => x.id === id);
+    props.printTask(task);
   }
 
   return (
@@ -44,11 +38,12 @@ function TaskList(props) {
             <th>Statut</th>
             <th>Date de début</th>
             <th>Date de fin</th>
+            <th>Assignees</th>  {/* Added column for Assignees */}
           </tr>
         </thead>
         <tbody>
-          {tasks.map((task, index) => (
-            <tr key={task.id} onClick={(e) => printTask(task.id)} className="cursor-pointer">
+          {tasks && tasks.map((task, index) => (
+            <tr key={task.id} onClick={() => printTask(task.id)} className="cursor-pointer">
               <td>{index + 1}</td>
               <td>{task.title}</td>
               <td>{task.description}</td>
@@ -59,7 +54,7 @@ function TaskList(props) {
                   onChange={(e) => handlePriorityChange(task.id, parseInt(e.target.value))}
                 >
                   {priorityLabels.map((label, idx) => (
-                    <option key={idx + 1} value={idx + 1} className={priorityColors[idx+1]}>{label}</option>
+                    <option key={idx + 1} value={idx + 1} className={priorityColors[idx + 1]}>{label}</option>
                   ))}
                 </select>
               </td>
@@ -70,12 +65,18 @@ function TaskList(props) {
                   onChange={(e) => handleStatusChange(task.id, parseInt(e.target.value))}
                 >
                   {statusLabels.map((label, idx) => (
-                    <option key={idx + 1} value={idx + 1} className={statusColors[idx+1]}>{label}</option>
+                    <option key={idx + 1} value={idx + 1} className={statusColors[idx + 1]}>{label}</option>
                   ))}
                 </select>
               </td>
               <td>{task.date_start}</td>
               <td>{task.date_end}</td>
+              <td>
+                {
+                 task.users.length > 0 &&
+                 task.users.map((user) => <div className="btn btn-light m-2">{user.username}</div>)
+                }
+              </td>
             </tr>
           ))}
         </tbody>

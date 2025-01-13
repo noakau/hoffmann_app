@@ -1,18 +1,15 @@
 import './App.css';
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Route, Routes, Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import TaskList from './TaskList';
 import DisplayTask from './DisplayTask';
-import CreateTask from './CreateTask';
-import UpdateTask from './UpdateTask';
-import LoginPage from './LoginPage'; 
-import CreateUser from './CreateUser'; 
+
 
 import { get_all_tasks, parseJwt } from "./api";
 
 
-
+let socket;
 
 function App() {
   const [tasks, setTasks] = useState([]);
@@ -55,6 +52,9 @@ function App() {
     if (token === null) {
       console.log("user is not even logged in");
       setis_admin(false);
+      if (window.location.href != "/") {
+        window.location.href = '/';
+      }
     } else {
       const data = parseJwt(token);
       setUsername(data.username);
@@ -66,6 +66,41 @@ function App() {
       console.log("user is not an administrator");
       }
     }
+
+
+    socket = new WebSocket('ws://localhost:3000');
+
+    socket.onopen = () => {
+      console.log('WebSocket connection established');
+    };
+
+    socket.onmessage = (event) => {
+      const message = JSON.parse(event.data);
+      console.log("New message:", message)
+      if (message.type === 'task_added') {
+        alert(`New task added: ${message.task[0].title}`);
+        get_all_tasks().then(setTasks);
+      } else if (message.type === 'task_deleted') {
+        alert(`Task deleted: ${message.taskId}`);
+        get_all_tasks().then(setTasks);
+      } else if (message.type === 'task_updated') {
+        alert(`Task updated: ${message.task[0].title}`);
+        get_all_tasks().then(setTasks);
+      } else {
+        alert(`New notification: ${message}`)
+      }
+    };
+
+    socket.onclose = () => {
+      console.log('WebSocket connection closed');
+    };
+
+    return () => {
+      if (socket) socket.close();
+    };
+
+
+
   }, []);
 
   const handleFilterChange = (e) => {
@@ -92,7 +127,7 @@ function App() {
     setSearch("");
   };
 
-  const filteredTasks = tasks.filter((task) => {
+  const filteredTasks = tasks?.filter((task) => {
     return (
       Object.keys(filters).every((key) =>
         task[key].toString().includes(filters[key])
@@ -102,22 +137,7 @@ function App() {
   });
 
   return (
-    <Router>
-      <Routes>
         
-                <Route path="/update" element={<UpdateTask />} />
-                <Route path="/create" element={<CreateTask />} />
-
-        {/* Route pour la page de connexion */}
-        <Route path="/" element={<LoginPage />} />
-
-        {/* Route pour la page d'inscription */}
-        <Route path="/create_user" element={<CreateUser />} />
-
-        {/* Route pour la gestion des tâches */}
-        <Route path ="/tasks"
-          
-          element={
             <div className="App">
               <nav className="navbar navbar-expand-lg navbar-light bg-light">
                 <a className="navbar-brand" href="#">
@@ -130,11 +150,7 @@ function App() {
               </nav>
               <div className="container-fluid">
                 <div className="row">
-                  <div className="col-md-2 bg-light border-right">
-                    <h5 className="mt-3">Connected Users</h5>
-                    {/* Add your connected users component or list here */}
-                  </div>
-                  <div className="col-md-10">
+                  <div className="col-md-12">
                     <div className="row">
                       <div className="mb-3 d-flex align-items-center flex-row">
                         <input
@@ -220,12 +236,6 @@ function App() {
                 </div>
               </div>
             </div>
-          }
-        />
-
-    
-      </Routes>
-    </Router>
   );
 }
 

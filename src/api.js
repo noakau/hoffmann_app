@@ -164,11 +164,57 @@ export const create_user = async (formData) => {
 
 
 export function parseJwt (token) {
+    // console.log(token)
+    // console.log("test")
     var base64Url = token.split('.')[1];
+    if (base64Url === undefined) {
+        localStorage.removeItem('token');
+        window.href.location = "/"
+        return null
+    }
     var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
     var jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
+    jsonPayload = JSON.parse(jsonPayload);
 
-    return JSON.parse(jsonPayload);
+
+    let currentTime = new Date();
+    // console.log(jsonPayload)
+    // console.log(jsonPayload.exp, currentTime.getTime()/1000)
+    if (jsonPayload?.exp === null || jsonPayload?.exp == undefined || jsonPayload?.exp < (currentTime.getTime()/1000)) {
+        localStorage.removeItem('token');
+        window.href.location = "/"
+        return null
+    }
+    return jsonPayload;
 }
+
+
+export function get_user_from_token() {
+    let token = localStorage.getItem('token', null);
+    if (token === null) {
+        return null;
+    } else {
+        return parseJwt(token);
+    }
+}
+
+export const get_all_users = async () => {
+    try {
+        const response = await fetch(`${API_URL}/users/`, {
+            headers: {
+                'Authorization': "Bearer " + localStorage.getItem('token'),
+            }
+        });
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error);
+        }
+        return data.data;
+    } catch (error) {
+        console.error("Error fetching all users:", error);
+        return null;
+    }
+};
