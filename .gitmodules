@@ -1,3 +1,4 @@
 [submodule "frontend"]
 	path = frontend
-	url = https://github.com/noakau/frontend.git
+	url = git@github.com:noakau/hoffmann_app.git
+	branch = frontend
