@@ -67,8 +67,8 @@ function App() {
       }
     }
 
-
-    socket = new WebSocket('ws://localhost:3000');
+    const domain_name = window.location.hostname;
+    socket = new WebSocket(`ws://${domain_name}`);
 
     socket.onopen = () => {
       console.log('WebSocket connection established');

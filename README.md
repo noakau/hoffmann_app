@@ -1,3 +1,39 @@
+# Hoffmann App Frontend
+
+Frontend de l'application Hoffmann App: application de gestion de tâches...
+
+## Demo (video):
+
+<video controls>
+  <source src="./context/demo-video-frontend.mp4" type="video/mp4">
+</video>
+
+
+
+## Réalisé par
+
+[Paul Claret](https://github.com/paulclrt/) <br>
+[Noa Kaufman](https://github.com/noakau/)
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br><br><br><br><br><br><br><br>
+
+
+
+
+---
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
